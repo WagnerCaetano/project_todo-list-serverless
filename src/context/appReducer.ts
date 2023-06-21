@@ -1,32 +1,55 @@
-import { DayListData, TodoListData } from "../../@types/schema";
+import { buildEmptyListData } from "@/service/utils";
+import { DayCardData, DayListData, TodoListData } from "../../@types/schema";
 
 export interface DayListDataState extends DayListData {}
 
-export const initialState: DayListDataState = {
-  days: [],
-};
-export const AppReducer = (
-  state: DayListDataState,
-  action: { type: "add_todo_task" | "init_stored"; value: TodoListData; day: string }
-) => {
-  switch (action.type) {
-    case "init_stored": {
-      return action.value;
-    }
+export type Action =
+  | { type: "ADD_DAY"; payload: DayCardData }
+  | { type: "REMOVE_DAY"; payload: string }
+  | { type: "ADD_TASK"; payload: TodoListData }
+  | { type: "REMOVE_TASK"; payload: TodoListData };
 
-    case "add_todo_task": {
+export const initialState: DayListDataState = buildEmptyListData();
+
+export const AppReducer = (state: DayListDataState, action: Action): DayListDataState => {
+  switch (action.type) {
+    case "ADD_DAY":
+      return {
+        ...state,
+        days: [...state.days, action.payload],
+      };
+    case "REMOVE_DAY":
+      return {
+        ...state,
+        days: state.days.filter((day) => day.date !== action.payload),
+      };
+    case "ADD_TASK":
       return {
         ...state,
         days: state.days.map((day) => {
-          if (day.date === action.day) {
+          if (day.date === action.payload.date) {
             return {
               ...day,
-              dayTodoList: [...day.dayTodoList, action.value],
+              dayTodoList: [...day.dayTodoList, action.payload],
             };
           }
           return day;
         }),
       };
-    }
+    case "REMOVE_TASK":
+      return {
+        ...state,
+        days: state.days.map((day) => {
+          if (day.date === action.payload.date) {
+            return {
+              ...day,
+              dayTodoList: day.dayTodoList.filter((task) => task.id !== action.payload.id),
+            };
+          }
+          return day;
+        }),
+      };
+    default:
+      return state;
   }
 };

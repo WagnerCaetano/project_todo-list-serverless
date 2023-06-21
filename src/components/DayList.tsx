@@ -7,6 +7,7 @@ export type DayListProps = {
 };
 
 const DayList: FunctionComponent<DayListProps> = ({ data }) => {
+  console.log(data);
   return (
     <div className="flex items-center justify-center ">
       <div className="w-screen overflow-x-auto p-8">
