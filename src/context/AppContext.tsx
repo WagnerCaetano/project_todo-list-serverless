@@ -11,6 +11,7 @@ export const AppWrapper: React.FC<any> = ({ children }) => {
   });
 
   useEffect(() => {
+    console.log(state);
     localStorage.setItem("state", JSON.stringify(state));
   }, [state]);
 

@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-full">
       <NavComponent />
-      <DayList data={state} />
+      <DayList data={state} dispatch={dispatch} />
     </div>
   );
 }
