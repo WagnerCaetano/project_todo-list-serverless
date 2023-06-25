@@ -1,12 +1,16 @@
 import { FunctionComponent, useState } from "react";
 import { TodoListData } from "../../@types/schema";
+import { useDrag, useDrop } from "react-dnd";
+import { useAppContext } from "@/context/AppContext";
 
 export type TodoProps = {
   todo: TodoListData;
+  sourceDayDate: string;
 };
 
-const Todo: FunctionComponent<TodoProps> = ({ todo }) => {
+const Todo: FunctionComponent<TodoProps> = ({ todo, sourceDayDate }) => {
   const [tempTodo, setTempTodo] = useState<TodoListData>(null);
+  const { dispatch } = useAppContext();
 
   const handleSetTempTodo = (key: keyof TodoListData, data: any) => {
     if (!!data?.target?.value) {
@@ -17,8 +21,42 @@ const Todo: FunctionComponent<TodoProps> = ({ todo }) => {
     }
   };
 
+  const [{ isDragging }, dragRef] = useDrag(() => ({
+    type: 'todo-item',
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+    end: (item, monitor) => {
+      const dropResult = monitor.getDropResult();
+      console.log(dropResult)
+      const newTask = {
+        ...todo
+      }
+      newTask.date = dropResult.targetDay
+      console.log(newTask)
+      if (dropResult) {
+        dispatch({
+          type: "REMOVE_TASK",
+          payload: {
+            date: sourceDayDate,
+            id: todo.id
+          },
+        });
+        dispatch({
+          type: "ADD_TASK",
+          payload: {...newTask},
+        });
+      }
+    }
+  }))
+
   return (
-    <div className="flex flex-col gap-2 justify-between bg-gray-950 p-2 py-4">
+    <div ref={dragRef} 
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        cursor: 'move',
+      }}
+      className="flex flex-col gap-2 justify-between bg-gray-950 p-2 py-4">
       {todo.title === "" ? (
         <input
           type="text"
