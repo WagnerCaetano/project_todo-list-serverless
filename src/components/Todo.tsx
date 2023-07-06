@@ -9,54 +9,62 @@ export type TodoProps = {
 };
 
 const Todo: FunctionComponent<TodoProps> = ({ todo, sourceDayDate }) => {
-  const [tempTodo, setTempTodo] = useState<TodoListData>(null);
+  const [tempTodo, setTempTodo] = useState<TodoListData>(todo);
   const { dispatch } = useAppContext();
+
+  const handleSaveTodo = () => {
+    if (tempTodo.title === "" || tempTodo.description === "") {
+      return;
+    }
+    dispatch({
+      type: "UPDATE_TASK",
+      payload: tempTodo,
+    });
+  };
+
+  const handleRemoveTodo = () => dispatch({ type: "REMOVE_TASK", payload: tempTodo });
 
   const handleSetTempTodo = (key: keyof TodoListData, data: any) => {
     if (!!data?.target?.value) {
       setTempTodo({
         ...tempTodo,
-        [key]: data,
+        [key]: data.target.value,
       });
     }
   };
 
-  const [{ isDragging }, dragRef] = useDrag(() => ({
-    type: 'todo-item',
+  const [{ isDragging }, todoRefDrag] = useDrag(() => ({
+    type: "todo-day",
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
     end: (item, monitor) => {
-      const dropResult = monitor.getDropResult();
-      console.log(dropResult)
-      const newTask = {
-        ...todo
-      }
-      newTask.date = dropResult.targetDay
-      console.log(newTask)
+      console.log(tempTodo);
+      const dropResult: any = monitor.getDropResult();
+      const newTask: TodoListData = {
+        ...tempTodo,
+      };
+      newTask.date = dropResult?.targetDay;
       if (dropResult) {
         dispatch({
-          type: "REMOVE_TASK",
+          type: "MOVE_TASK",
           payload: {
-            date: sourceDayDate,
-            id: todo.id
+            oldDate: sourceDayDate,
+            newDate: newTask.date,
+            id: tempTodo.id,
+            todo: newTask,
           },
         });
-        dispatch({
-          type: "ADD_TASK",
-          payload: {...newTask},
-        });
       }
-    }
-  }))
+    },
+  }));
 
   return (
-    <div ref={dragRef} 
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: 'move',
-      }}
-      className="flex flex-col gap-2 justify-between bg-gray-950 p-2 py-4">
+    <div
+      ref={todoRefDrag}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      className="flex flex-col gap-2 justify-between bg-gray-950 p-2 py-4 cursor-move"
+    >
       {todo.title === "" ? (
         <input
           type="text"
@@ -95,8 +103,13 @@ const Todo: FunctionComponent<TodoProps> = ({ todo, sourceDayDate }) => {
             handleSetTempTodo("completed", data.target.value == "on");
           }}
         />
-        <button className=" text-white">Save</button>
-        <button className=" text-white">Delete</button>
+        <button className=" text-white" onClick={handleSaveTodo}>
+          Save
+        </button>
+        <button className=" text-white" onClick={handleRemoveTodo}>
+          {" "}
+          Delete
+        </button>
       </div>
     </div>
   );

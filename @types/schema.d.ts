@@ -8,8 +8,9 @@ export type TodoListData = {
 };
 
 export type DayCardData = {
-  id: number;
+  id: string;
   date: string;
+  late: boolean;
   dayTodoList: TodoListData[];
 };
 

@@ -3,7 +3,7 @@ import React, { FunctionComponent } from "react";
 import Todo from "./Todo";
 import { TodoListData } from "../../@types/schema";
 import { useAppContext } from "@/context/AppContext";
-import { create_UUID } from "@/service/utils";
+import { nanoid } from "nanoid";
 import { useDrop } from "react-dnd";
 
 export type DayCardProps = {
@@ -23,7 +23,7 @@ const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList, dayIndex }) =
         completed: false,
         date: dayFormatted,
         description: "",
-        id: create_UUID(),
+        id: nanoid(),
         priority: "low",
         title: "",
       },
@@ -31,15 +31,18 @@ const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList, dayIndex }) =
     console.log(state);
   };
 
-  const [{ isOver }, dropRef] = useDrop(() => ({
-    accept: 'todo-item',
-    drop: () => ({
-      targetDay: day,
+  const [{ isOver }, dropRef] = useDrop(
+    () => ({
+      accept: "todo-day",
+      drop: () => ({
+        targetDay: day,
+      }),
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver(),
+      }),
     }),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    })
-  }), [dayIndex])
+    [dayIndex]
+  );
 
   return (
     <div className="rounded-lg p-2 flex-shrink-0 w-1/5 min-h-[720px] max-h-full shadow-xl bg-gray-700">
@@ -48,7 +51,11 @@ const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList, dayIndex }) =
           <p className="text-xl text-center mx-auto">{dayFormatted}</p>
           <button onClick={handleAddTask}>+</button>
         </div>
-        <div ref={dropRef} style={{display: 'flex', gap: 25, flexDirection: 'column', flex: 1, backgroundColor: isOver ? 'red' : 'unset', height: '100%'}}>
+        <div
+          ref={dropRef}
+          className="flex flex-col flex-1 gap-6 h-full"
+          style={{ backgroundColor: isOver ? "red" : "unset" }}
+        >
           {todoList.map((todo) => {
             return <Todo sourceDayDate={day} key={todo.id} todo={todo} />;
           })}
