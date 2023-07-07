@@ -42,7 +42,9 @@ export const handleLateDays = (parsedState: DayListDataState): DayListDataState 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dayDate = new Date(day.date);
-    if (dayDate < today && day.dayTodoList.length > 0) {
+    console.log(today);
+    console.log(dayDate);
+    if (dayDate < today) {
       qtdLate++;
       day.late = true;
       return day;
@@ -52,6 +54,8 @@ export const handleLateDays = (parsedState: DayListDataState): DayListDataState 
       return day;
     }
   });
+  parsedState.days = parsedState.days.filter((day) => !day.late || (day.late && day.dayTodoList.length > 0));
+  console.log(qtdLate);
   const nextDays = buildEmptyListData(qtdLate, oldLength);
   parsedState.days = [...parsedState.days, ...nextDays.days];
   return parsedState;
