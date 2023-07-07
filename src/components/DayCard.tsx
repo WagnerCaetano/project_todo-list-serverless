@@ -30,15 +30,21 @@ const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList }) => {
   };
 
   return (
-    <div className="rounded-lg p-2 flex-shrink-0 w-1/5 min-h-[720px] max-h-full shadow-xl bg-gray-700">
+    <div className="rounded-lg p-2 flex-shrink-0 w-1/5 min-h-[720px] max-h-full shadow-xl bg-zinc-950 ">
       <div className="flex flex-col gap-4 h-full">
         <div className="flex flex-row">
           <p className="text-xl text-center mx-auto">{dayFormatted}</p>
           <button onClick={handleAddTask}>+</button>
         </div>
         <Droppable droppableId={dayFormatted}>
-          {(provided) => (
-            <div ref={provided.innerRef} {...provided.droppableProps} className="flex flex-col flex-1 gap-6 h-full">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`flex flex-col flex-1 gap-6 h-full rounded transition-all duration-250 delay-250 p-2 ${
+                snapshot.isDraggingOver ? "bg-zinc-900" : ""
+              }`}
+            >
               {todoList.map((todo, index) => {
                 return <Todo key={todo.id} todo={todo} index={index} />;
               })}

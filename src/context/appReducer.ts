@@ -9,8 +9,11 @@ export type Action =
   | { type: "ADD_TASK"; payload: TodoListData }
   | { type: "REMOVE_TASK"; payload: { date: string; id: string } }
   | { type: "UPDATE_TASK"; payload: TodoListData }
-  | { type: "REORDER_TASK"; payload: { oldPos: number; newPos: number; id: string } }
-  | { type: "MOVE_TASK"; payload: { oldDate: string; newDate: string; id: string; todo: TodoListData } };
+  | { type: "REORDER_TASK"; payload: { source: any; destination: any } }
+  | {
+      type: "MOVE_TASK";
+      payload: { start: DayCardData; source: any; finish: DayCardData; destination: any; state: DayListDataState };
+    };
 
 export const initialState: DayListDataState = buildEmptyListData();
 
@@ -69,47 +72,54 @@ export const AppReducer = (state: DayListDataState, action: Action): DayListData
       };
     }
     case "REORDER_TASK": {
-      const { oldPos, newPos, id } = action.payload;
-      const updatedDays = state.days.map((day) => {
-        if (day.dayTodoList.find((task) => task.id === id)) {
-          const newDayTodoList = day.dayTodoList.filter((task) => task.id !== id);
-          newDayTodoList.splice(newPos, 0, day.dayTodoList[oldPos]);
-          return {
-            ...day,
-            dayTodoList: newDayTodoList,
-          };
-        }
-        return day;
-      });
+      const { source, destination } = action.payload;
+      const column = state.days.find((day) => day.date.slice(0, 10).replaceAll("-", "/") === source.droppableId);
+      const newTaskIds = Array.from(column.dayTodoList);
+      const deleted = newTaskIds.splice(source.index, 1);
+      newTaskIds.splice(destination.index, 0, deleted[0]);
+
+      const newColumn = {
+        ...column,
+        dayTodoList: newTaskIds,
+      };
+
       return {
         ...state,
-        days: updatedDays,
+        days: state.days.map((day) => {
+          if (day.date.slice(0, 10).replaceAll("-", "/") === newColumn.date.slice(0, 10).replaceAll("-", "/")) {
+            return newColumn;
+          } else {
+            return day;
+          }
+        }),
       };
     }
     case "MOVE_TASK": {
-      const { oldDate, newDate, id, todo } = action.payload;
-      const updatedDays = state.days
-        .map((day) => {
-          if (day.date === oldDate) {
-            return {
-              ...day,
-              dayTodoList: day.dayTodoList.filter((task) => task.id !== id),
-            };
-          }
-          return day;
-        })
-        .map((day) => {
-          if (day.date === newDate) {
-            return {
-              ...day,
-              dayTodoList: [...day.dayTodoList, todo],
-            };
-          }
-          return day;
-        });
+      const { start, source, finish, destination, state } = action.payload;
+      const startTodoList = Array.from(start.dayTodoList);
+      const deleted = startTodoList.splice(source.index, 1);
+      const newStart = {
+        ...start,
+        dayTodoList: startTodoList,
+      };
+      const finishTodoList = Array.from(finish.dayTodoList);
+      finishTodoList.splice(destination.index, 0, deleted[0]);
+      const newFinish = {
+        ...finish,
+        dayTodoList: finishTodoList,
+      };
+
       return {
         ...state,
-        days: updatedDays,
+        days: state.days.map((day) => {
+          if (day.date === newStart.date) {
+            return newStart;
+          } else if (day.date === newFinish.date) {
+            return newFinish;
+          } else {
+            return day;
+          }
+        }),
       };
     }
     default:

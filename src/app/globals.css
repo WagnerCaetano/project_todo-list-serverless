@@ -18,3 +18,8 @@
   background: #888;
   border-radius: 5px;;
 }
+
+p {
+  margin: 0;
+  padding: 0;
+}

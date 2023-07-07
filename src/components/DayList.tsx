@@ -1,16 +1,38 @@
+"use client";
 import { FunctionComponent } from "react";
 import DayCard from "./DayCard";
-import { DayListData } from "../../@types/schema";
+import { DayCardData, DayListData } from "../../@types/schema";
 import { DragDropContext } from "react-beautiful-dnd";
+import { useAppContext } from "@/context/AppContext";
+import { DayListDataState } from "@/context/appReducer";
 
 export type DayListProps = {
   data: DayListData;
 };
 
 const DayList: FunctionComponent<DayListProps> = ({ data }) => {
-  console.log(data.days);
+  const { state, dispatch } = useAppContext();
+
   const onDragEnd = (result) => {
-    // TODO: reorder our column
+    const { destination, source } = result;
+
+    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+      return;
+    }
+
+    const start = state.days.find((day) => day.date === source.droppableId);
+    const finish = state.days.find((day) => day.date === destination.droppableId);
+    if (start === finish) {
+      dispatch({
+        type: "REORDER_TASK",
+        payload: { source, destination },
+      });
+    } else {
+      dispatch({
+        type: "MOVE_TASK",
+        payload: { start, source, finish, destination, state },
+      });
+    }
   };
 
   return (
@@ -20,7 +42,7 @@ const DayList: FunctionComponent<DayListProps> = ({ data }) => {
           <DragDropContext
             onDragStart={() => console.log("drag start")}
             onDragUpdate={() => console.log("drag update")}
-            onDragEnd={() => console.log("drag end")}
+            onDragEnd={onDragEnd}
           >
             {data.days.map((day) => {
               return <DayCard day={day.date} todoList={day.dayTodoList} />;
