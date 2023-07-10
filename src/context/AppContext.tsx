@@ -7,7 +7,10 @@ export const LocalStorageAppContext = createContext<{ state: DayListDataState; d
 
 export const AppWrapper: React.FC<any> = ({ children }) => {
   const [state, dispatch] = useReducer(AppReducer, initialState, () => {
-    const localState = localStorage.getItem("state");
+    let localState = null;
+    if (typeof window !== "undefined") {
+      localState = localStorage.getItem("state");
+    }
     const parsedState: DayListDataState =
       localState && localState !== "undefined" ? JSON.parse(localState) : initialState;
     const modifiedState = handleLateDays(parsedState);
@@ -15,7 +18,9 @@ export const AppWrapper: React.FC<any> = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem("state", JSON.stringify(state));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("state", JSON.stringify(state));
+    }
   }, [state]);
 
   const contextValue = useMemo<{ state: DayListDataState; dispatch: Dispatch<Action> }>(
