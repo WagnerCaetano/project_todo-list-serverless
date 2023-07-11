@@ -39,16 +39,13 @@ export const useAppContext = () => {
   return context;
 };
 
-export const handleLateDays = (parsedState: DayListDataState): DayListDataState => {
+const handleLateDays = (parsedState: DayListDataState): DayListDataState => {
   let qtdLate = 0;
   const oldLength = parsedState.days.length;
-  console.log(parsedState.days);
   parsedState.days = parsedState.days.map((day) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dayDate = new Date(day.date);
-    console.log(today);
-    console.log(dayDate);
     if (dayDate < today) {
       qtdLate++;
       day.late = true;
@@ -60,7 +57,6 @@ export const handleLateDays = (parsedState: DayListDataState): DayListDataState 
     }
   });
   parsedState.days = parsedState.days.filter((day) => !day.late || (day.late && day.dayTodoList.length > 0));
-  console.log(qtdLate);
   const nextDays = buildEmptyListData(qtdLate, oldLength);
   parsedState.days = [...parsedState.days, ...nextDays.days];
   return parsedState;

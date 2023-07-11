@@ -5,6 +5,7 @@ import { TodoListData } from "../../@types/schema";
 import { useAppContext } from "@/context/AppContext";
 import { nanoid } from "nanoid";
 import { Droppable } from "react-beautiful-dnd";
+import { FaPlusCircle } from "react-icons/fa";
 
 export type DayCardProps = {
   day: string;
@@ -34,7 +35,11 @@ const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList }) => {
       <div className="flex flex-col gap-4 h-full">
         <div className="flex flex-row">
           <p className="text-xl text-center mx-auto">{dayFormatted}</p>
-          <button onClick={handleAddTask}>+</button>
+          <FaPlusCircle
+            className="hover:text-green-500 transform transition-all duration-250 delay-250 cursor-pointer 
+          text-xl text-gray-500"
+            onClick={handleAddTask}
+          />
         </div>
         <Droppable droppableId={dayFormatted}>
           {(provided, snapshot) => (

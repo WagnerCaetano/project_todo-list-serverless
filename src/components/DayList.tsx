@@ -1,10 +1,9 @@
 "use client";
 import { FunctionComponent } from "react";
 import DayCard from "./DayCard";
-import { DayCardData, DayListData } from "../../@types/schema";
+import { DayListData } from "../../@types/schema";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useAppContext } from "@/context/AppContext";
-import { DayListDataState } from "@/context/appReducer";
 
 export type DayListProps = {
   data: DayListData;
@@ -45,7 +44,7 @@ const DayList: FunctionComponent<DayListProps> = ({ data }) => {
             onDragEnd={onDragEnd}
           >
             {data.days.map((day) => {
-              return <DayCard day={day.date} todoList={day.dayTodoList} />;
+              return <DayCard day={day.date} key={day.date} todoList={day.dayTodoList} />;
             })}
           </DragDropContext>
         </ul>

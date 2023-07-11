@@ -13,6 +13,9 @@ export type Action =
   | {
       type: "MOVE_TASK";
       payload: { start: DayCardData; source: any; finish: DayCardData; destination: any; state: DayListDataState };
+    }
+  | {
+      type: "ORDER_BY_PRIORITY";
     };
 
 export const initialState: DayListDataState = buildEmptyListData();
@@ -120,6 +123,32 @@ export const AppReducer = (state: DayListDataState, action: Action): DayListData
             return day;
           }
         }),
+      };
+    }
+    case "ORDER_BY_PRIORITY": {
+      const newDays = state.days.map((day) => {
+        const newDayTodoList = day.dayTodoList.sort((a, b) => {
+          if (a.priority === b.priority) {
+            return 0;
+          } else if (a.priority === "high") {
+            return -1;
+          } else if (a.priority === "medium" && b.priority === "low") {
+            return -1;
+          } else if (a.priority === "medium" && b.priority === "high") {
+            return 1;
+          } else if (a.priority === "low") {
+            return 1;
+          }
+          return 0;
+        });
+        return {
+          ...day,
+          dayTodoList: newDayTodoList,
+        };
+      });
+      return {
+        ...state,
+        days: newDays,
       };
     }
     default:
