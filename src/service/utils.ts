@@ -6,7 +6,7 @@ export function buildEmptyListData(qtdToGenerate = 7, nextIndex = 0): DayListDat
     const date = new Date();
     date.setDate(date.getDate() + i + nextIndex);
     days.push({
-      id: i + nextIndex,
+      id: date.toISOString().slice(0, 10).replaceAll("-", ""),
       date: date.toISOString().slice(0, 10).replaceAll("-", "/"),
       dayTodoList: [],
       late: false,

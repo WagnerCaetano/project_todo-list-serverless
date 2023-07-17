@@ -44,7 +44,7 @@ const DayList: FunctionComponent<DayListProps> = ({ data }) => {
             onDragEnd={onDragEnd}
           >
             {data.days.map((day) => {
-              return <DayCard day={day.date} key={day.date} todoList={day.dayTodoList} />;
+              return <DayCard day={day.date} key={day.date} todoList={day.dayTodoList} late={day.late} />;
             })}
           </DragDropContext>
         </ul>

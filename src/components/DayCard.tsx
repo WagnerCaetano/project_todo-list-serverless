@@ -10,9 +10,10 @@ import { FaPlusCircle } from "react-icons/fa";
 export type DayCardProps = {
   day: string;
   todoList: TodoListData[];
+  late: boolean;
 };
 
-const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList }) => {
+const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList, late }) => {
   const { state, dispatch } = useAppContext();
   const dayFormatted = day.slice(0, 10).replaceAll("-", "/");
 
@@ -31,7 +32,11 @@ const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList }) => {
   };
 
   return (
-    <div className="rounded-lg p-2 flex-shrink-0 w-1/5 min-h-[720px] max-h-full shadow-xl bg-zinc-950 ">
+    <div
+      className={`rounded-lg p-2 flex-shrink-0 w-1/5 min-h-[720px] max-h-full shadow-xl ${
+        late ? " bg-[#120202]" : "bg-zinc-950"
+      }`}
+    >
       <div className="flex flex-col gap-4 h-full">
         <div className="flex flex-row">
           <p className="text-xl text-center mx-auto">{dayFormatted}</p>
@@ -51,7 +56,7 @@ const DayCard: FunctionComponent<DayCardProps> = ({ day, todoList }) => {
               }`}
             >
               {todoList.map((todo, index) => {
-                return <Todo key={todo.id} todo={todo} index={index} />;
+                return <Todo key={todo.id} todo={todo} index={index} late={late} />;
               })}
               {provided.placeholder}
             </div>

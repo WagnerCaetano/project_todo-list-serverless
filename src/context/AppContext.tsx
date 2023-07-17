@@ -41,7 +41,7 @@ export const useAppContext = () => {
 
 const handleLateDays = (parsedState: DayListDataState): DayListDataState => {
   let qtdLate = 0;
-  const oldLength = parsedState.days.length;
+  const oldLength = parsedState.days.length - 1;
   parsedState.days = parsedState.days.map((day) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

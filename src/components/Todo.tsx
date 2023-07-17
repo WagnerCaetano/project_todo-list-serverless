@@ -8,9 +8,10 @@ import { FaTrash } from "react-icons/fa";
 export type TodoProps = {
   todo: TodoListData;
   index: number;
+  late: boolean;
 };
 
-const Todo: FunctionComponent<TodoProps> = ({ todo, index }) => {
+const Todo: FunctionComponent<TodoProps> = ({ todo, index, late }) => {
   const [tempTodo, setTempTodo] = useState<TodoListData>(todo);
   const { dispatch } = useAppContext();
 
@@ -58,7 +59,9 @@ const Todo: FunctionComponent<TodoProps> = ({ todo, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
-          className={`flex flex-row flex-shrink justify-around gap-3 rounded bg-zinc-800 mx-2 p-2 py-4 cursor-move transition-all duration-250 delay-250 ${
+          className={`flex flex-row flex-shrink justify-around gap-3 rounded ${
+            late ? "bg-[#360404]" : "bg-zinc-800"
+          } mx-2 p-2 py-4 cursor-move transition-all duration-250 delay-250 ${
             snapshot.isDragging ? "border-2 border-dashed border-zinc-500" : ""
           } ${tempTodo.completed ? "bg-opacity-25" : ""}`}
         >
